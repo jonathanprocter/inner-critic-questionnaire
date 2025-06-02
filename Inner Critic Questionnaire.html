@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inner Critic Questionnaire</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:600,700|Segoe+UI:400,500&display=swap">
+  <style>
+    :root {
+      --primary: #3a7ca5;
+      --secondary: #2f6690;
+      --accent: #16425b;
+      --success: #4caf50;
+      --warning: #ffc107;
+      --danger: #d9534f;
+      --light: #f9f9f9;
+      --surface: #fff;
+      --surface-dark: #23272f;
+      --text: #222;
+      --text-light: #eee;
+      --info: #6497b1;
+      --shadow: 0 2px 14px rgba(36,61,101,0.10);
+    }
+
+    body {
+      font-family: 'Segoe UI', Montserrat, Arial, sans-serif;
+      background: var(--light);
+      color: var(--text);
+      margin: 0;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    .dark-mode {
+      background: #181b20;
+      color: var(--text-light);
+    }
+    .container {
+      max-width: 760px;
+      margin: 32px auto;
+      padding: 24px 16px 40px 16px;
+      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      transition: background 0.3s;
+      min-height: 90vh;
+    }
+    .dark-mode .container {
+      background: var(--surface-dark);
+    }
+    h1, h2, h3 {
+      font-family: 'Montserrat', Arial, sans-serif;
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 14px;
+      letter-spacing: -1px;
+    }
+    .dark-mode h1, .dark-mode h2, .dark-mode h3 { color: var(--info);}
+    .intro, .btn-container, .privacy-warning { text-align: center; }
+    .scale {
+      display: flex; justify-content: space-between;
+      margin: 18px 0 22px 0; padding: 12px 0;
+      background: #e8f1f8; border-radius: 7px;
+    }
+    .dark-mode .scale { background: #25303a;}
+    .scale-item span { font-weight: 700; font-size: 1.2rem; }
+    .question-card {
+      margin-bottom: 20px; padding: 20px;
+      border-radius: 10px;
+      background: #f6fafd;
+      box-shadow: 0 2px 10px rgba(36,61,101,0.06);
+      transition: background 0.3s;
+    }
+    .dark-mode .question-card { background: #232a33; }
+    .question-text { margin-bottom: 14px; font-weight: 500; font-size: 1.14rem;}
+    fieldset { border: none; margin: 0; padding: 0;}
+    .options {
+      display: flex; justify-content: space-between; flex-wrap: wrap;
+    }
+    .option {
+      flex: 1; min-width: 75px; margin: 0 5px;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .option input[type="radio"] { accent-color: var(--primary);}
+    .option label { margin-top: 7px; font-size: 1.02rem; }
+    .btn {
+      background: var(--primary); color: #fff;
+      padding: 12px 26px; border: none;
+      border-radius: 5px; font-size: 1.09rem;
+      font-family: inherit; cursor: pointer;
+      margin: 7px;
+      transition: background 0.25s, box-shadow 0.25s;
+      box-shadow: 0 2px 8px rgba(36,61,101,0.06);
+    }
+    .btn:hover, .btn:focus { background: var(--accent);}
+    .btn[disabled] { background: #aaa; cursor: not-allowed; }
+    .btn.secondary { background: var(--secondary);}
+    .btn.danger { background: var(--danger);}
+    .btn.success { background: var(--success);}
+    .btn.info { background: var(--info);}
+    .btn.export { background: var(--warning); color: #333;}
+    .btn.export:hover { background: #ffe08a;}
+    .question-dots {
+      display: flex; justify-content: center; margin: 18px 0 12px 0;
+      flex-wrap: wrap;
+    }
+    .dot {
+      width: 18px; height: 18px; border-radius: 50%; margin: 3px 5px;
+      border: 2px solid var(--primary); background: #e2eaf2;
+      cursor: pointer; transition: background 0.18s, border 0.18s;
+      outline: none;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .dot.current { border-color: var(--accent); box-shadow: 0 0 7px var(--accent);}
+    .dot.answered { background: var(--primary);}
+    .dot.unanswered { background: #e2eaf2;}
+    .dot:focus { border-color: var(--info);}
+    .dark-mode .dot.unanswered { background: #2a3744; }
+    .progress-bar-bg { height: 11px; border-radius: 6px; background: #e0e0e0; margin: 18px 0; }
+    .progress-bar { height: 11px; background: var(--primary); border-radius: 6px; width: 0%; transition: width 0.3s;}
+    .dark-mode .progress-bar-bg { background: #2a3744;}
+    .results { margin-top: 28px;}
+    .result-item { margin-bottom: 18px;}
+    .result-bar-container { width: 100%; height: 20px; background: #e0e0e0; border-radius: 6px; margin-top: 7px;}
+    .dark-mode .result-bar-container { background: #2a3744;}
+    .result-bar { height: 100%; background: var(--primary); border-radius: 6px; width: 0%; transition: width 1s;}
+    .critic-type {
+      margin-top: 28px; padding: 18px;
+      background: #eaf4fb; border-radius: 9px;
+      position: relative;
+      margin-bottom: 16px;
+      transition: background 0.3s;
+    }
+    .dark-mode .critic-type { background: #2a3744;}
+    .critic-name { font-weight: 700; font-size: 1.15rem; color: var(--accent);}
+    .dark-mode .critic-name { color: var(--warning);}
+    .critic-desc { margin-bottom: 9px;}
+    .critic-info-icon {
+      display: inline-block; margin-left: 7px; font-size: 1.1em;
+      cursor: pointer; color: var(--info); vertical-align: -2px;
+      transition: color 0.2s;
+    }
+    .critic-info-icon:hover { color: var(--primary);}
+    .tooltip {
+      position: absolute; z-index: 99;
+      left: 28px; top: 34px;
+      background: #fff; color: #333;
+      padding: 11px 14px; border-radius: 7px;
+      box-shadow: 0 4px 20px rgba(30,60,90,0.16);
+      font-size: 1rem; max-width: 340px;
+      display: none;
+    }
+    .dark-mode .tooltip { background: #23272f; color: #fff;}
+    .tooltip.visible { display: block;}
+    .toggle-darkmode {
+      position: fixed; right: 16px; top: 12px; z-index: 50;
+      background: #333; color: #fff;
+      border: none; border-radius: 18px;
+      padding: 6px 18px;
+      cursor: pointer; font-size: 1rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    .toggle-darkmode:hover { background: var(--primary);}
+    .privacy-warning {
+      padding: 12px 14px; margin: 14px auto 0 auto; max-width: 500px;
+      background: #fff6e0; border: 1px solid var(--warning); color: #795300;
+      border-radius: 6px;
+      font-size: 1.03rem;
+      display: none;
+    }
+    @media (max-width: 650px) {
+      .container { padding: 8px 3vw;}
+      .critic-type { padding: 11px; }
+    }
+  </style>
+</head>
+<body>
+  <button class="toggle-darkmode" aria-label="Toggle dark mode">🌗 Dark Mode</button>
+  <div class="container" role="main">
+    <section id="intro-section" class="active" aria-label="Intro">
+      <h1>Inner Critic Questionnaire</h1>
+      <div class="intro">
+        <p>This questionnaire helps you determine which of the seven types of "inner critics" may be most active for you.</p>
+        <p>All progress is autosaved. You can return to finish at any time.</p>
+        <p>Read each statement, and select the number that matches your experience:</p>
+      </div>
+      <div class="scale" aria-label="Scale explanation">
+        <div class="scale-item"><span>0</span>Never</div>
+        <div class="scale-item"><span>1</span>Not often</div>
+        <div class="scale-item"><span>2</span>Occasionally</div>
+        <div class="scale-item"><span>3</span>Frequently</div>
+        <div class="scale-item"><span>4</span>Always</div>
+      </div>
+      <div class="btn-container">
+        <button class="btn" id="start-btn">Start Questionnaire</button>
+      </div>
+    </section>
+
+    <section id="questions-section" style="display:none;" aria-label="Questions">
+      <h2>Inner Critic Questionnaire</h2>
+      <div class="progress-bar-bg"><div class="progress-bar" id="progress-bar"></div></div>
+      <div class="question-dots" id="question-dots"></div>
+      <div id="question-container"></div>
+      <div class="btn-container">
+        <button class="btn secondary" id="prev-btn">Previous</button>
+        <button class="btn" id="next-btn">Next</button>
+      </div>
+    </section>
+
+    <section id="results-section" style="display:none;" aria-label="Results">
+      <h2>Your Results</h2>
+      <p>The higher the score, the more active this critic is in your life.</p>
+      <div class="results" id="results-container"></div>
+      <h3>Understanding Your Inner Critics</h3>
+      <div id="critic-types-container"></div>
+      <div class="privacy-warning" id="privacy-warning"></div>
+      <div class="btn-container">
+        <button class="btn export" id="pdf-btn">Export PDF</button>
+        <button class="btn info" id="share-btn">Share via Email</button>
+        <button class="btn secondary" id="print-btn">Print</button>
+        <button class="btn danger" id="reset-btn">Start Over</button>
+      </div>
+    </section>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    // Questionnaire data & critic type info
+    const questions = [
+      { id: 1, text: "I feel like I am intrinsically flawed.", criticType: "Destroyer" },
+      { id: 2, text: "I set high standards for myself.", criticType: "Perfectionist" },
+      { id: 3, text: "I feel terrible about myself when I get out of control.", criticType: "Inner Controller" },
+      { id: 4, text: "I push myself to work very hard so I can achieve my goals.", criticType: "Taskmaster" },
+      { id: 5, text: "When I think of trying something new and challenging, I give up before I begin.", criticType: "Underminer" },
+      { id: 6, text: "I am ashamed of everything about myself.", criticType: "Destroyer" },
+      { id: 7, text: "I am troubled by something I have done that I cannot forgive myself for.", criticType: "Guilt Tripper" },
+      { id: 8, text: "I know who I ought to be, and I'm hard on myself when I act differently.", criticType: "Molder" },
+      { id: 9, text: "I expend a great deal of effort trying to control my impulsive behaviour.", criticType: "Inner Controller" },
+      { id: 10, text: "My self-confidence is so low that I don't believe I can succeed at anything.", criticType: "Underminer" },
+      { id: 11, text: "I attack myself when I make a mistake.", criticType: "Perfectionist" },
+      { id: 12, text: "I have trouble holding onto a positive sense of myself.", criticType: "Destroyer" },
+      { id: 13, text: "I have a hard time feeling OK about myself when I'm not acting in accordance with my childhood programming.", criticType: "Molder" },
+      { id: 14, text: "There is no end to the things I have to do.", criticType: "Taskmaster" },
+      { id: 15, text: "I do things to people that I feel terribly guilty for.", criticType: "Guilt Tripper" },
+      { id: 16, text: "There are indulgent parts of me that take over and get me into trouble, and then I punish myself for it.", criticType: "Inner Controller" },
+      { id: 17, text: "I believe that it is safer not to try than to fail.", criticType: "Underminer" },
+      { id: 18, text: "I get anxious and self-critical when things don't come out just right.", criticType: "Perfectionist" },
+      { id: 19, text: "I feel ashamed when I don't measure up to others' expectations.", criticType: "Molder" },
+      { id: 20, text: "I tell myself that, if I were a good person, I would take better care of people I care about.", criticType: "Guilt Tripper" },
+      { id: 21, text: "At a deep level I feel like I don't have the right to exist.", criticType: "Destroyer" },
+      { id: 22, text: "I feel bad because I am too lazy to really make it in the world.", criticType: "Taskmaster" },
+      { id: 23, text: "I feel really ashamed of some of my habits.", criticType: "Inner Controller" },
+      { id: 24, text: "I spend much more time than is needed on a project in order to make it as good as possible.", criticType: "Perfectionist" }
+    ];
+    const criticTypes = {
+      "Perfectionist": {
+        name: "The Perfectionist",
+        description: "Sets impossible standards for you and then attacks you when you don't measure up. Judges you by your productivity and achievement.",
+        tip: "Try to notice the voice that equates your worth with constant achievement. Practice self-compassion and celebrate effort, not just outcomes.",
+        learn: "Perfectionism often arises from a desire for acceptance or to avoid criticism. You can gently challenge these beliefs by embracing mistakes as a normal part of growth."
+      },
+      "Inner Controller": {
+        name: "The Inner Controller",
+        description: "Tries to control impulsive behavior it believes may harm you or result in rejection or failure.",
+        tip: "Notice when self-control becomes self-punishment. Ask: is this voice helping me learn, or is it shaming me?",
+        learn: "Self-control is important, but harsh self-punishment can be counterproductive. Explore ways to regulate impulses that feel kind, not punitive."
+      },
+      "Taskmaster": {
+        name: "The Taskmaster",
+        description: "Pushes you to work harder or be more successful, criticizing you as lazy or incompetent.",
+        tip: "Pause and acknowledge your hard work. What might happen if you rested, even for a moment?",
+        learn: "Relentless pushing often masks fears of inadequacy. Balance productivity with self-care for sustainable success."
+      },
+      "Underminer": {
+        name: "The Underminer",
+        description: "Undermines your confidence so you avoid risks that might lead to failure.",
+        tip: "Notice when your inner dialogue says 'don't try.' What would you say to a friend in the same situation?",
+        learn: "The underminer protects you from disappointment, but at a high cost. Growth happens outside your comfort zone; try safe, small risks and celebrate progress."
+      },
+      "Destroyer": {
+        name: "The Destroyer",
+        description: "Attacks your fundamental self-worth and is deeply shaming.",
+        tip: "When you notice harsh shame or self-loathing, pause and gently name it as 'the destroyer.' This can help you get some distance.",
+        learn: "This critic often borrows voices from the past. Reconnect with sources of unconditional acceptance and reflect on your intrinsic value."
+      },
+      "Guilt Tripper": {
+        name: "The Guilt Tripper",
+        description: "Attacks you for a specific action you took (or didn’t take) in the past, especially with loved ones.",
+        tip: "Notice when guilt motivates you to make amends vs. when it keeps you stuck. Practice self-forgiveness and repair when possible.",
+        learn: "Guilt can be useful for empathy and making amends, but chronic guilt wears you down. Self-forgiveness is a key part of healing."
+      },
+      "Molder": {
+        name: "The Molder",
+        description: "Pressures you to fit a certain societal or family mold.",
+        tip: "Ask yourself: whose standards am I really trying to meet? Your authenticity is valuable.",
+        learn: "The molder often echoes cultural or family messages. Explore your values and experiment with acting from your true self."
+      }
+    };
+    
+    // --- State & Elements ---
+    let currentQuestionIndex = 0;
+    const answers = {};
+    let darkMode = localStorage.getItem('darkMode') === 'true';
+    
+    // --- DOM Elements ---
+    const introSection = document.getElementById('intro-section');
+    const questionsSection = document.getElementById('questions-section');
+    const resultsSection = document.getElementById('results-section');
+    const questionContainer = document.getElementById('question-container');
+    const progressBar = document.getElementById('progress-bar');
+    const resultsContainer = document.getElementById('results-container');
+    const criticTypesContainer = document.getElementById('critic-types-container');
+    const questionDots = document.getElementById('question-dots');
+    const privacyWarning = document.getElementById('privacy-warning');
+    // Buttons
+    const startBtn = document.getElementById('start-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const printBtn = document.getElementById('print-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const pdfBtn = document.getElementById('pdf-btn');
+    const shareBtn = document.getElementById('share-btn');
+    const toggleDarkBtn = document.querySelector('.toggle-darkmode');
+    
+    // --- Accessibility Helper ---
+    function scrollIntoViewIfMobile(element) {
+      if (window.innerWidth < 650 && element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+    
+    // --- Dark Mode ---
+    function applyDarkMode(on) {
+      darkMode = on;
+      document.body.classList.toggle('dark-mode', darkMode);
+      localStorage.setItem('darkMode', darkMode);
+      toggleDarkBtn.innerText = darkMode ? "🌞 Light Mode" : "🌗 Dark Mode";
+    }
+    toggleDarkBtn.addEventListener('click', () => applyDarkMode(!darkMode));
+    applyDarkMode(darkMode);
+    
+    // --- Navigation / State ---
+    startBtn.addEventListener('click', startQuestionnaire);
+    prevBtn.addEventListener('click', () => { showQuestion(currentQuestionIndex - 1); });
+    nextBtn.addEventListener('click', nextQuestion);
+    printBtn.addEventListener('click', () => window.print());
+    resetBtn.addEventListener('click', resetQuestionnaire);
+    pdfBtn.addEventListener('click', exportPDF);
+    shareBtn.addEventListener('click', shareViaEmail);
+    
+    // --- Questionnaire Navigation Dots ---
+    function renderQuestionDots() {
+      questionDots.innerHTML = '';
+      questions.forEach((q, idx) => {
+        const dot = document.createElement('span');
+        dot.tabIndex = 0;
+        dot.setAttribute('role', 'button');
+        dot.setAttribute('aria-label', `Go to question ${idx + 1}`);
+        dot.className = 'dot' +
+        (idx === currentQuestionIndex ? ' current' : '') +
+        (answers[q.id] !== undefined ? ' answered' : ' unanswered');
+        dot.addEventListener('click', () => showQuestion(idx));
+        dot.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') showQuestion(idx);
+        });
+        questionDots.appendChild(dot);
+      });
+    }
+    
+    function startQuestionnaire() {
+      introSection.style.display = "none";
+      questionsSection.style.display = "";
+      showQuestion(0);
+    }
+    
+    function showQuestion(index) {
+      currentQuestionIndex = index;
+      renderQuestionDots();
+      const question = questions[index];
+      
+      // Progress Bar
+      progressBar.style.width = `${((index + 1) / questions.length) * 100}%`;
+      
+      // Question HTML
+      questionContainer.innerHTML = `
+        <div class="question-card" id="current-question-card">
+          <form>
+            <fieldset>
+              <legend class="question-text">${index + 1}. ${question.text}</legend>
+              <div class="options" aria-label="Options for question ${index + 1}">
+                ${[0,1,2,3,4].map(i =>
+        `<div class="option">
+                    <input type="radio" id="q${question.id}_${i}" name="q${question.id}" value="${i}" ${answers[question.id]===i?"checked":""}>
+                    <label for="q${question.id}_${i}">${i}</label>
+                  </div>`
+      ).join('')}
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      `;
+      
+      // Keyboard focus for accessibility
+      setTimeout(() => {
+        const el = document.getElementById('current-question-card');
+        if (el) el.focus();
+      }, 90);
+      
+      // Option Change
+      questionContainer.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+          answers[question.id] = parseInt(radio.value);
+          saveToLocalStorage();
+          renderQuestionDots();
+        });
+      });
+      
+      prevBtn.disabled = (index === 0);
+      nextBtn.innerText = (index === questions.length - 1) ? "See Results" : "Next";
+      scrollIntoViewIfMobile(questionContainer);
+    }
+    
+    function nextQuestion() {
+      if (answers[questions[currentQuestionIndex].id] === undefined) {
+        showModal("Please select an answer before proceeding.");
+        return;
+      }
+      if (currentQuestionIndex < questions.length - 1) {
+        showQuestion(currentQuestionIndex + 1);
+      } else {
+        showResults();
+      }
+    }
+    
+    // --- Modal Feedback (Accessible) ---
+    function showModal(msg) {
+      const dialog = document.createElement('div');
+      dialog.setAttribute('role','alertdialog');
+      dialog.style.position = "fixed";
+      dialog.style.left = 0; dialog.style.top = 0; dialog.style.width = "100vw"; dialog.style.height = "100vh";
+      dialog.style.background = "rgba(0,0,0,0.30)";
+      dialog.style.zIndex = 1001;
+      dialog.style.display = "flex"; dialog.style.alignItems = "center"; dialog.style.justifyContent = "center";
+      dialog.innerHTML = `
+        <div style="background:#fff; color:#222; border-radius:8px; max-width:350px; padding:30px 24px; font-size:1.1rem; box-shadow:0 4px 32px rgba(0,0,0,0.25);">
+          ${msg}<br><br>
+          <button class="btn secondary" style="width:100%;margin:0" id="close-modal-btn">OK</button>
+        </div>
+      `;
+      if (darkMode) dialog.querySelector('div').style.background = '#23272f', dialog.querySelector('div').style.color='#fff';
+      document.body.appendChild(dialog);
+      document.getElementById('close-modal-btn').focus();
+      dialog.querySelector('button').addEventListener('click', () => document.body.removeChild(dialog));
+    }
+    
+    // --- Results ---
+    function showResults() {
+      // Check for unanswered questions
+      const unanswered = questions.filter(q => answers[q.id] === undefined);
+      if (unanswered.length > 0) {
+        showModal(`You have ${unanswered.length} unanswered question(s). Please complete all questions for accurate results.`);
+        return;
+      }
+      questionsSection.style.display = "none";
+      resultsSection.style.display = "";
+      
+      // Scores
+      const { raw, percentages, counts } = calculateScores();
+      // Display
+      displayResults({raw, percentages, counts});
+      displayCriticTypes({raw, percentages, counts});
+      scrollIntoViewIfMobile(resultsContainer);
+    }
+    
+    function calculateScores() {
+      const scores = {}, questionCounts = {};
+      Object.keys(criticTypes).forEach(type => { scores[type] = 0; questionCounts[type] = 0; });
+      questions.forEach(q => {
+        if (answers[q.id] !== undefined) {
+          scores[q.criticType] += answers[q.id];
+          questionCounts[q.criticType]++;
+        }
+      });
+      const percentages = {};
+      for (const type in scores) {
+        const maxPossible = questionCounts[type] * 4;
+        percentages[type] = (scores[type] / (maxPossible || 1)) * 100;
+      }
+      return { raw: scores, percentages, counts: questionCounts };
+    }
+    
+    function displayResults(scores) {
+      resultsContainer.innerHTML = '';
+      const sorted = Object.keys(scores.percentages).sort((a,b) => scores.percentages[b] - scores.percentages[a]);
+      sorted.forEach(type => {
+        const pct = scores.percentages[type], rawScore = scores.raw[type], maxScore = scores.counts[type] * 4;
+        const div = document.createElement('div');
+        div.className = 'result-item';
+        div.innerHTML = `
+          <div><strong>${criticTypes[type].name}</strong>: ${rawScore}/${maxScore} (${Math.round(pct)}%)</div>
+          <div class="result-bar-container">
+            <div class="result-bar" style="width:0%"></div>
+          </div>
+        `;
+        resultsContainer.appendChild(div);
+        setTimeout(() => { div.querySelector('.result-bar').style.width = `${pct}%`; }, 80);
+      });
+    }
+    
+    function displayCriticTypes(scores) {
+      criticTypesContainer.innerHTML = '';
+      const sorted = Object.keys(scores.percentages).sort((a,b) => scores.percentages[b] - scores.percentages[a]);
+      sorted.forEach(type => {
+        const pct = scores.percentages[type];
+        const significance = pct >= 75 ? 'very significant'
+        : pct >= 50 ? 'significant'
+        : pct >= 25 ? 'moderately active' : 'less active';
+        
+        const div = document.createElement('div');
+        div.className = 'critic-type';
+        div.innerHTML = `
+          <div class="critic-name">
+            ${criticTypes[type].name} (${Math.round(pct)}%)
+            <span class="critic-info-icon" tabindex="0" aria-label="Learn more about ${criticTypes[type].name}" data-type="${type}">ⓘ</span>
+          </div>
+          <div class="critic-desc">${criticTypes[type].description}</div>
+          <div><em>This critic appears to be <strong>${significance}</strong> in your life.</em></div>
+          <div class="critic-tip" style="margin-top:8px;color:var(--success);"><strong>Tip:</strong> ${criticTypes[type].tip}</div>
+        `;
+        criticTypesContainer.appendChild(div);
+        
+        // Tooltip
+        const infoIcon = div.querySelector('.critic-info-icon');
+        const tooltip = document.createElement('div');
+        tooltip.className = 'tooltip';
+        tooltip.innerText = criticTypes[type].learn;
+        infoIcon.addEventListener('mouseenter', () => { tooltip.classList.add('visible'); });
+        infoIcon.addEventListener('focus', () => { tooltip.classList.add('visible'); });
+        infoIcon.addEventListener('mouseleave', () => { tooltip.classList.remove('visible'); });
+        infoIcon.addEventListener('blur', () => { tooltip.classList.remove('visible'); });
+        infoIcon.parentNode.appendChild(tooltip);
+      });
+    }
+    
+    // --- Export & Share ---
+    function exportPDF() {
+      const doc = new window.jspdf.jsPDF();
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(17);
+      doc.text("Inner Critic Questionnaire Results", 14, 18);
+      doc.setFontSize(11);
+      let y = 30;
+      const { raw, percentages, counts } = calculateScores();
+      for (const type of Object.keys(criticTypes)) {
+        doc.setFont("helvetica", "bold");
+        doc.text(`${criticTypes[type].name}`, 14, y);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Score: ${raw[type]}/${counts[type]*4} (${Math.round(percentages[type])}%)`, 70, y);
+        y += 8;
+        doc.text(criticTypes[type].description, 14, y, {maxWidth:180});
+        y += 13;
+      }
+      doc.save("inner_critic_results.pdf");
+    }
+    
+    function shareViaEmail() {
+      privacyWarning.innerHTML = `
+        <strong>Privacy Notice:</strong> Sending results by email will use your own mail app and will NOT store data on a server. Only share results with your therapist or someone you trust.<br><br>
+        <button class="btn info" id="proceed-email-btn">Proceed to Email</button>
+        <button class="btn danger" id="cancel-email-btn">Cancel</button>
+      `;
+      privacyWarning.style.display = "block";
+      document.getElementById('proceed-email-btn').onclick = () => {
+        const { raw, percentages, counts } = calculateScores();
+        let mailBody = "My Inner Critic Questionnaire Results:\n\n";
+        for (const type of Object.keys(criticTypes)) {
+          mailBody += `${criticTypes[type].name}: ${raw[type]}/${counts[type]*4} (${Math.round(percentages[type])}%)\n`;
+        }
+        const mailto = `mailto:?subject=Inner Critic Results&body=${encodeURIComponent(mailBody)}`;
+        window.location.href = mailto;
+        privacyWarning.style.display = "none";
+      };
+      document.getElementById('cancel-email-btn').onclick = () => privacyWarning.style.display = "none";
+    }
+    
+    // --- Reset ---
+    function resetQuestionnaire() {
+      for (const key in answers) delete answers[key];
+      localStorage.removeItem('innerCriticAnswers');
+      introSection.style.display = "";
+      questionsSection.style.display = "none";
+      resultsSection.style.display = "none";
+      currentQuestionIndex = 0;
+      renderQuestionDots();
+    }
+    
+    // --- Local Storage ---
+    function saveToLocalStorage() {
+      localStorage.setItem('innerCriticAnswers', JSON.stringify(answers));
+    }
+    function loadFromLocalStorage() {
+      const saved = localStorage.getItem('innerCriticAnswers');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        for (const key in parsed) { answers[key] = parsed[key]; }
+      }
+    }
+    
+    // --- Init ---
+    loadFromLocalStorage();
+    renderQuestionDots();
+  </script>
+</body>
+</html>
